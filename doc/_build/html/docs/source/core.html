@@ -60,7 +60,7 @@
 
 <dl class="class">
 <dt id="core.base.Dataset">
-<em class="property">class </em><code class="sig-prename descclassname">core.base.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.base.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">core.base.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param">figure_num=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.base.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Dataset object is used to store different values</p>
 <dl class="method">
@@ -191,7 +191,7 @@ BufferedFileStorage: A buffered writable file descriptor</p>
 <span id="core-metrics-module"></span><h2>core.metrics module<a class="headerlink" href="#module-core.metrics" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="core.metrics.Estimator_Metric">
-<em class="property">class </em><code class="sig-prename descclassname">core.metrics.</code><code class="sig-name descname">Estimator_Metric</code><span class="sig-paren">(</span><em class="sig-param">true_value</em>, <em class="sig-param">estimate=[]</em>, <em class="sig-param">type='MSE'</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Estimator_Metric" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">core.metrics.</code><code class="sig-name descname">Estimator_Metric</code><span class="sig-paren">(</span><em class="sig-param">estimator</em>, <em class="sig-param">true_value=None</em>, <em class="sig-param">type='MSE'</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Estimator_Metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#core.base.Metric" title="core.base.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">core.base.Metric</span></code></a></p>
 <dl class="method">
 <dt id="core.metrics.Estimator_Metric.append">
@@ -216,20 +216,14 @@ BufferedFileStorage: A buffered writable file descriptor</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="core.metrics.Theoretical_Metric">
-<em class="property">class </em><code class="sig-prename descclassname">core.metrics.</code><code class="sig-name descname">Theoretical_Metric</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Theoretical_Metric" title="Permalink to this definition">¶</a></dt>
+<dt id="core.metrics.Time_Metric">
+<em class="property">class </em><code class="sig-prename descclassname">core.metrics.</code><code class="sig-name descname">Time_Metric</code><span class="sig-paren">(</span><em class="sig-param">processor</em>, <em class="sig-param">type='mean'</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Time_Metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#core.base.Metric" title="core.base.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">core.base.Metric</span></code></a></p>
 <dl class="method">
-<dt id="core.metrics.Theoretical_Metric.evaluate">
-<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Theoretical_Metric.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt id="core.metrics.Time_Metric.append">
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Time_Metric.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="core.metrics.Time_Metric">
-<em class="property">class </em><code class="sig-prename descclassname">core.metrics.</code><code class="sig-name descname">Time_Metric</code><span class="sig-paren">(</span><em class="sig-param">processor</em>, <em class="sig-param">attribute</em>, <em class="sig-param">type='mean'</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Time_Metric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#core.base.Metric" title="core.base.Metric"><code class="xref py py-class docutils literal notranslate"><span class="pre">core.base.Metric</span></code></a></p>
 <dl class="method">
 <dt id="core.metrics.Time_Metric.evaluate">
 <code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Time_Metric.evaluate" title="Permalink to this definition">¶</a></dt>
@@ -241,8 +235,8 @@ BufferedFileStorage: A buffered writable file descriptor</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="core.metrics.Time_Metric.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Time_Metric.update" title="Permalink to this definition">¶</a></dt>
+<dt id="core.metrics.Time_Metric.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.metrics.Time_Metric.reset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -263,8 +257,13 @@ BufferedFileStorage: A buffered writable file descriptor</p>
 
 <dl class="class">
 <dt id="core.processors.Linear_Channel">
-<em class="property">class </em><code class="sig-prename descclassname">core.processors.</code><code class="sig-name descname">Linear_Channel</code><span class="sig-paren">(</span><em class="sig-param">H</em>, <em class="sig-param">N=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.processors.Linear_Channel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">core.processors.</code><code class="sig-name descname">Linear_Channel</code><span class="sig-paren">(</span><em class="sig-param">H_tot</em>, <em class="sig-param">N=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.processors.Linear_Channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#core.base.Processor" title="core.base.Processor"><code class="xref py py-class docutils literal notranslate"><span class="pre">core.base.Processor</span></code></a></p>
+<dl class="method">
+<dt id="core.processors.Linear_Channel.H">
+<em class="property">property </em><code class="sig-name descname">H</code><a class="headerlink" href="#core.processors.Linear_Channel.H" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="core.processors.Linear_Channel.process">
 <code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#core.processors.Linear_Channel.process" title="Permalink to this definition">¶</a></dt>
@@ -313,7 +312,7 @@ BufferedFileStorage: A buffered writable file descriptor</p>
 
 <dl class="method">
 <dt id="core.processors.SequentialProcessor.add_connection">
-<code class="sig-name descname">add_connection</code><span class="sig-paren">(</span><em class="sig-param">connection</em><span class="sig-paren">)</span><a class="headerlink" href="#core.processors.SequentialProcessor.add_connection" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_connection</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">destination</em><span class="sig-paren">)</span><a class="headerlink" href="#core.processors.SequentialProcessor.add_connection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

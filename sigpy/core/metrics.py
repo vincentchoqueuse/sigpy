@@ -4,11 +4,14 @@ import numpy.linalg as lg
 
 class Time_Metric(Metric):
 
-    def __init__(self,processor,attribute,type = "mean",name = None):
+    def __init__(self,processor,type = "mean",name = None):
         self.processor = processor
-        self.attribute = attribute
         self.time_elapsed = []
+        self.type = type
         self.name = name
+    
+    def reset(self):
+        self.time_elapsed = []
     
     def get_name(self):
         if self.name is None:
@@ -17,9 +20,9 @@ class Time_Metric(Metric):
             name = self.name
         return name
     
-    def update(self):
-        value = getattr(self.processor,self.attribute)
-        self.time_elapsed.append(value)
+    def append(self):
+        time_elapsed = getattr(self.processor,"time_elapsed")
+        self.time_elapsed.append(time_elapsed)
     
     def evaluate(self):
         if type == "mean":
@@ -29,23 +32,26 @@ class Time_Metric(Metric):
 
 class Estimator_Metric(Metric):
 
-    def __init__(self,true_value,estimate=[],type = "MSE",name = None):
+    def __init__(self,estimator,true_value=None,type = "MSE",name = None):
+        self.estimator = estimator
         self.true_value = true_value
-        self.estimate = estimate
+        self.estimate = []
         self.type = type
         self.name = name
-        self.collected_data = []
+    
+    def get_name(self):
+        if self.name is None:
+            name = self.estimator.get_name()
+        else:
+            name = self.name
+        return name
     
     def reset(self):
         self.estimate = []
-        self.collected_data = []
-    
-    def get_name(self):
-        return self.name
 
     def append(self):
-        self.estimate.append(self.collected_data)
-        self.collected_data = []
+        estimate = getattr(self.estimator,"estimate")
+        self.estimate.append(estimate)
     
     def evaluate(self):
         if self.type == "MSE":
@@ -53,18 +59,6 @@ class Estimator_Metric(Metric):
         return value
 
 
-class Theoretical_Metric(Metric):
-
-    def __init__(self,**kwargs):
-        for arg in kwargs:
-            setattr(self,arg,kwargs[arg])
-    
-    def evaluate(self):
-        H = self.H[:self.N,:]
-        H_T = np.transpose(H)
-        C = self.sigma2*lg.inv(np.dot(H_T,self.H))
-        value = np.diag(C)
-        return value
 
 
 

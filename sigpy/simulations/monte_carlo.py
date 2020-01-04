@@ -2,17 +2,9 @@ from sigpy.core import Connection, Dataset, Metric
 import numpy as np
 import matplotlib.pyplot as plt
 
-class MC_context():
-
-    def __init__(self):
-        self.value = None
-        self.propagate = True
-
-    def get_name(self):
-        return "mc_context"
 
 
-class Single_Monte_Carlo():
+class Monte_Carlo():
     
     '''
         The Single Monte_Carlo object is used to perform a Monte Carlo Simulation.
@@ -20,106 +12,78 @@ class Single_Monte_Carlo():
         Monte Carlo simulations are based on a context object that manages the simulation. This context manages the connections to add before the simulation (method `add_context_connection`)
         '''
 
-    def __init__(self,nb_trials = 1000):
-        self.context = MC_context()
-        self.nb_trials = nb_trials
-        self.processor = []
-        self.metrics = []
-        self.bounds = []
-        self.context_connections = []
-        self.connections = []
-
-    def prepare(self,param_value):
-        self.data = []
-        self.context.value = param_value
-        for connection in self.context_connections:
-            connection.propagate()
-        
-        for metric in self.metrics + self.bounds:
-            metric.reset()
-
-    def add_context_connection(self,destination,attribute):
-        connection = Connection(self.context,"value",destination,attribute)
-        self.context_connections.append(connection)
-
-    def add_connection(self,source,attribute_source,destination,attribute_destination=None):
-        if attribute_destination == None:
-            attribute_destination = attribute_source
-        connection = Connection(source,attribute_source,destination,attribute_destination)
-        self.connections.append(connection)
-        
-        # store sender name to metric
-        if isinstance(destination, Metric):
-            destination.name = source.get_name()
-
-    def add_metric(self,metric):
-        self.metrics.append(metric)
-
-    def add_bound(self,bound):
-        self.bounds.append(bound)
-
-    def set_processor(self,processor):
+    def __init__(self,processor):
         self.processor = processor
-
-    def show(self):
-        print("-------- Processor --------")
-        print(self.processor.show())
-        print("--- Context Connections ---")
-        for connection in self.context_connections:
-            print(connection.show())
-        print("------- Connections -------")
-        for connection in self.connections:
-            print(connection.show())
-
-    def run(self,param_value):
-        self.prepare(param_value)
+    
+    def evaluate(self,metric_list,nb_trials=100):
         
-        for num_trial in range(self.nb_trials):
+        for metric in metric_list:
+            metric.reset()
+        
+        for num_trial in range(nb_trials):
             self.processor.process()
-            for connection in self.connections:
-                connection.propagate()
             
-            for metric in self.metrics:
+            for metric in metric_list:
                 metric.append()
 
-        metrics_bounds = self.metrics + self.bounds
-        for indice in range(len(metrics_bounds)):
-            metric = metrics_bounds[indice]
-            metric_value = metric.evaluate()
-            self.data.append(metric_value)
+        data = []
+        for indice in range(len(metric_list)):
+            metric_value = metric_list[indice].evaluate()
+            data.append(metric_value)
+
+        return data
 
 
 
-class Monte_Carlo(Single_Monte_Carlo):
+class Monte_Carlo_Scenario():
 
-    def __init__(self,nb_trials = 1000):
-        self.context = MC_context()
-        self.nb_trials = nb_trials
-        self.processor = []
-        self.metrics = []
-        self.bounds = []
-        self.context_connections = []
-        self.connections = []
-        self.dataset = []
-
-    def plot(self,x=None):
-        for dataset in self.dataset:
+    def __init__(self,processor):
+        self.processor = processor
+        self.theoretical_list = []
+    
+    def plot(self,x=None,legend=True):
+        for dataset in self.dataset_list:
             dataset.plot(x=x)
+        if legend == True:
+            plt.legend()
 
-    def run(self,param_values):
+    def set_scenario(self,receiver_list,parameter,param_values):
+        self.receiver_list = receiver_list
+        self.parameter = parameter
+        self.param_values = param_values
+    
+    def add_theoretical(self,theoretical):
+        self.theoretical_list.append(theoretical)
+    
+    def evaluate(self,metric_list,nb_trials=100):
         
-        self.dataset = []
+        dataset_list = []
+        theoretical_list = self.theoretical_list
         
-        for metric in self.metrics + self.bounds:
+        for metric in metric_list + theoretical_list:
             dataset = Dataset(figure_num=1,name=metric.name)
-            dataset.set_header(param_values)
-            self.dataset.append(dataset)
+            dataset.set_header(self.param_values)
+            dataset_list.append(dataset)
         
-        for indice in range(len(param_values)):
-            super().run(param_values[indice])
-        
-            for indice in range(len(self.data)):
-                self.dataset[indice].append(self.data[indice])
+        mc = Monte_Carlo(self.processor)
+        for indice in range(len(self.param_values)):
 
+            param_value = self.param_values[indice]
+            
+            print("* Parameter Value: {} ".format(param_value))
+            
+            for receiver in self.receiver_list:
+                setattr(receiver,self.parameter,param_value)
+            
+            data = mc.evaluate(metric_list,nb_trials=nb_trials)
+            
+            #add theoretical values
+            for theoretical in theoretical_list:
+                data.append(theoretical.evaluate())
+        
+            for indice in range(len(data)):
+                dataset_list[indice].append(data[indice])
+
+        self.dataset_list = dataset_list
 
 

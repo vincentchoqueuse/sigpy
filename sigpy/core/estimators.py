@@ -11,7 +11,7 @@ class Estimator(Processor):
 
     def process(self,data):
         value = self.fit(data)
-        setattr(self,"estimate",value)
+        self.estimate = value
         return data
 
 class Linear_Estimator(Estimator):

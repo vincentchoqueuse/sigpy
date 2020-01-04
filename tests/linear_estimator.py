@@ -1,45 +1,41 @@
 import os, sys
 sys.path.append("..")
 
-from sigpy.core import Generator, Linear_Channel, Noise, Linear_Estimator, SequentialProcessor, Estimator_Metric, Theoretical_Metric
-from sigpy.simulations import Monte_Carlo
+from sigpy.core import Generator, Linear_Channel, Noise, Linear_Estimator, SequentialProcessor, Estimator_Metric
+from sigpy.simulations import Monte_Carlo_Scenario
 import numpy as np
 from scipy.stats import norm
 import numpy.linalg as lg
 import matplotlib.pyplot as plt
 
 
-class MSE_bound(Theoretical_Metric):
+class MSE_bound():
+    
+    def __init__(self,channel,noise,name="mse bound"):
+        self.channel = channel
+        self.noise = noise
+        self.name = name
 
     def evaluate(self):
-        H = self.H[:self.N,:]
-        C = self.sigma2*lg.inv(np.dot(np.transpose(H),self.H))
+        H = self.channel.H
+        sigma2 = self.noise.sigma2
+        C = sigma2*lg.inv(np.dot(np.transpose(H),H))
         return np.diag(C)
 
 # General Parameters
-x = norm.rvs(size=3)
-H = norm.rvs(size=(100,3))
-
-generator = Generator(x)
-channel = Linear_Channel(H)
-noise = Noise(sigma2=0)
-estimator = Linear_Estimator(H,name="est")
-processor =  SequentialProcessor([generator,channel,noise,estimator])
+generator = Generator(norm.rvs(size=3))
+channel = Linear_Channel(norm.rvs(size=(100,3)))
+noise = Noise()
+estimator = Linear_Estimator(channel.H)
+processor = SequentialProcessor([generator,channel,noise,estimator])
 
 # Monte Carlo
-metric = Estimator_Metric(true_value=x)
-bound = MSE_bound(H=H,sigma2=0,N=100,name = "mse")
+metric = Estimator_Metric(estimator,true_value = generator.data)
+bound = MSE_bound(channel,noise)
 
-mc = Monte_Carlo(nb_trials = 1000)
-mc.set_processor(processor)
-mc.add_metric(metric)
-mc.add_bound(bound)
-mc.add_context_connection(noise,"sigma2")
-mc.add_context_connection(bound,"sigma2")
-mc.add_connection(estimator,"estimate",metric,"collected_data")
-
-x_vect = np.arange(0.2,1.4,0.2)
-mc.run(x_vect)
+mc = Monte_Carlo_Scenario(processor)
+mc.set_scenario([noise],"sigma2",np.arange(0.1,1.4,0.1))
+mc.add_theoretical(bound)
+mc.evaluate([metric], 1000)
 mc.plot()
-plt.legend()
 plt.show()

@@ -123,7 +123,7 @@ class Dataset():
     def append(self,data_temp,header_temp=None,verbose=True):
         self.data.append(data_temp)
         if verbose == True :
-            print("Dataset ({}): {}".format(self.get_name(),data_temp))
+            print("Dataset ({}):\t{}".format(self.get_name(),data_temp).expandtabs(15))
 
     def show(self):
         header = self.get_header()

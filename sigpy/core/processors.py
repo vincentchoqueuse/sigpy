@@ -1,4 +1,4 @@
-from .base import Processor
+from .base import Processor,Connection
 import numpy as np
 from scipy.stats import norm
 import time
@@ -40,7 +40,8 @@ class SequentialProcessor():
     def get_connection(self,index):
         return self.connections[index]
 
-    def add_connection(self,connection):
+    def add_connection(self,source,destination):
+        connection = Connection(source[0],source[1],destination[0],destination[1])
         self.connections.append(connection)
 
     def show(self):
@@ -98,15 +99,21 @@ class Recorder(Processor):
 
 class Linear_Channel(Processor):
 
-    def __init__(self,H,N=None,name=None):
-        self.H = H
-        self.N = H.shape[0]
+    def __init__(self,H_tot,N=None,name=None):
+        self.H_tot = H_tot
+        self.N = N
         self.name = name
-    
+
+    @property
+    def H(self):
+        if self.N==None:
+            H = self.H_tot
+        else:
+            H = self.H_tot[:self.N,:]
+        return H
+
     def process(self,data):
-        N = self.N
-        H = self.H[:N,:]
-        data = np.dot(H,data)
+        data = np.dot(self.H,data)
         return data
 
 class Noise(Processor):
